@@ -1,20 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, Text } from "react-native";
+import MapScreen from "./src/screens/MapScreen";
 
-export default function App() {
+function SearchScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Search coming next 🔍</Text>
+    </View>
+  );
+}
+function SavedScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Saved coming next ❤️</Text>
+    </View>
+  );
+}
+function ProfileScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Profile coming next 👤</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Tab.Navigator>
+          <Tab.Screen name="Map" component={MapScreen} options={{ title: "SafeEats" }} />
+          <Tab.Screen name="Search" component={SearchScreen} />
+          <Tab.Screen name="Saved" component={SavedScreen} />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
+  );
+}
