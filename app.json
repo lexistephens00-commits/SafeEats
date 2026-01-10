@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "safeeats",
+    "name": "GFreeWay",
     "slug": "safeeats",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/gfreewayicon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lexstephens.safeeats",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +30,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "MAPBOX_ACCESS_TOKEN": "YOUR_MAPBOX_TOKEN_HERE",
+      "eas": {
+        "projectId": "8a266c8f-bf6d-4252-b4f9-2aaf50cf1654"
+      }
+    },
+    "owner": "lexstephens",
+    "plugins": [
+      "@rnmapbox/maps"
+    ]
   }
 }
