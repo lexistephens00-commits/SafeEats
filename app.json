@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/gfreewayicon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/gfreewayicon.png",
       "resizeMode": "contain",
