@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-cat > ~/.netrc <<EOF
-machine api.mapbox.com
-login mapbox
-password ${MAPBOX_DOWNLOADS_TOKEN}
-EOF
+NETRC_PATH="$HOME/.netrc"
 
-chmod 600 ~/.netrc
-echo "✅ Wrote ~/.netrc for Mapbox downloads"
+# Write netrc (no extra whitespace)
+printf "machine api.mapbox.com\nlogin mapbox\npassword %s\n" "$MAPBOX_DOWNLOADS_TOKEN" > "$NETRC_PATH"
+
+# Force correct permissions
+chmod 600 "$NETRC_PATH"
+
+# Sanity check: fail the build if permissions are wrong
+PERM="$(stat -f '%Lp' "$NETRC_PATH" 2>/dev/null || true)"
+if [ "$PERM" != "600" ]; then
+  echo "❌ .netrc permissions are $PERM, expected 600"
+  ls -la "$NETRC_PATH"
+  exit 1
+fi
+
+echo "✅ Wrote $NETRC_PATH with 600 permissions"
