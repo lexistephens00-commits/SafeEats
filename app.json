@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/gfreewayicon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -39,7 +39,12 @@
     },
     "owner": "lexstephens",
     "plugins": [
-      "@rnmapbox/maps"
-    ]
+  [
+    "@rnmapbox/maps",
+    {
+      "RNMapboxMapsVersion": "10.17.0"
+    }
+  ]
+]
   }
-}
+} 
