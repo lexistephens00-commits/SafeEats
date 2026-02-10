@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export default function SavedScreen() {
+export default function PlacesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Saved Coming Soon ⭐️</Text>
+      <Text style={styles.text}>Gluten-Free Places Coming Soon 🍽️</Text>
     </View>
   );
 }

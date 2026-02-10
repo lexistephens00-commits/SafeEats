@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/gfreewayicon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/gfreewayicon.png",
       "resizeMode": "contain",
@@ -15,9 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lexstephens.safeeats",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "infoPlist": { "ITSAppUsesNonExemptEncryption": false }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,23 +26,13 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.lexstephens.safeeats"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
+    "web": { "favicon": "./assets/favicon.png" },
     "extra": {
-      "MAPBOX_ACCESS_TOKEN": "YOUR_MAPBOX_TOKEN_HERE",
-      "eas": {
-        "projectId": "8a266c8f-bf6d-4252-b4f9-2aaf50cf1654"
-      }
+      "GOOGLE_PLACES_API_KEY": "AIzaSyB5GcMlpqeIFD7mYB3wTdgAKOovBmivdDg",
+      "GOOGLE_ROUTES_API_KEY": "AIzaSyB5GcMlpqeIFD7mYB3wTdgAKOovBmivdDg",
+
+      "eas": { "projectId": "8a266c8f-bf6d-4252-b4f9-2aaf50cf1654" }
     },
-    "owner": "lexstephens",
-    "plugins": [
-  [
-    "@rnmapbox/maps",
-    {
-      "RNMapboxMapsVersion": "10.17.0"
-    }
-  ]
-]
+    "owner": "lexstephens"
   }
-} 
+}

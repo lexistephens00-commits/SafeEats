@@ -9,13 +9,16 @@ import {
   FlatList,
   Keyboard,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { searchPlacesMapbox, type SearchPlace } from "../services/mapboxSearch";
 
 export default function SearchOverlay({
   onSelectPlace,
+  onOpenChange,
 }: {
   onSelectPlace: (place: SearchPlace) => void;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,11 @@ export default function SearchOverlay({
   const [results, setResults] = useState<SearchPlace[]>([]);
 
   const canSearch = useMemo(() => query.trim().length >= 2, [query]);
+
+  // Tell parent when dropdown/modal is open (so MapScreen can disable map gestures)
+  useEffect(() => {
+    onOpenChange?.(!!err || results.length > 0);
+  }, [err, results.length, onOpenChange]);
 
   // Debounced search while typing
   useEffect(() => {
@@ -60,9 +68,10 @@ export default function SearchOverlay({
       const r = await searchPlacesMapbox(q, 8);
       setResults(r);
 
-      if (r.length >0) {
+      // Optional: auto-zoom on "Go" to best result
+      if (r.length > 0) {
         onSelectPlace(r[0]);
-        setResults([]);
+        setResults([]); // close results after auto-select
       }
     } catch (e: any) {
       setErr(e?.message ?? "Search failed");
@@ -71,45 +80,74 @@ export default function SearchOverlay({
       setLoading(false);
     }
   }
-  
+
+  const modalVisible = !!err || results.length > 0;
+
   return (
-  <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-    {/* ✅ Touch shield: when results are open, this blocks the map from stealing taps */}
-    {results.length > 0 && (
-      <Pressable
-        style={StyleSheet.absoluteFill}
-        onPress={() => {
+    <>
+      {/* Search bar stays on top of the map */}
+      <View style={styles.wrap}>
+        <View style={styles.bar}>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search anywhere (city, address, restaurant)…"
+            placeholderTextColor="#666"
+            style={styles.input}
+            returnKeyType="search"
+            onSubmitEditing={runSearchNow}
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+
+          {
+            query.length > 0 && (
+              <Pressable
+                style={styles.clearBtn}
+                onPress={() => {
+                  setQuery("");
+                    setResults([]);
+                    setErr(null);
+                    Keyboard.dismiss();
+          }}
+          hitSlop={10}
+          >
+            <Text style={styles.clearText}>×</Text>
+            </Pressable>
+            )}
+
+          <Pressable style={styles.goBtn} onPress={runSearchNow}>
+            {loading ? (
+              <ActivityIndicator />
+            ) : (
+              <Text style={styles.goText}>Go</Text>
+            )}
+          </Pressable>
+        </View>
+      </View>
+
+      {/* ✅ Modal results: always tappable above Mapbox on iOS */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        presentationStyle="overFullScreen"
+        onRequestClose={() => {
           Keyboard.dismiss();
           setResults([]);
         }}
-      />
-    )}
-
-    {/* UI container */}
-    <View style={styles.wrap}>
-      <View style={styles.bar}>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search anywhere (city, address, restaurant)…"
-          placeholderTextColor="#666"
-          style={styles.input}
-          returnKeyType="search"
-          onSubmitEditing={runSearchNow}
-          autoCorrect={false}
-          autoCapitalize="none"
+      >
+        {/* Tap outside closes */}
+        <Pressable
+          style={styles.modalBackdrop}
+          onPress={() => {
+            Keyboard.dismiss();
+            setResults([]);
+          }}
         />
-        <Pressable style={styles.goBtn} onPress={runSearchNow}>
-          {loading ? (
-            <ActivityIndicator />
-          ) : (
-            <Text style={styles.goText}>Go</Text>
-          )}
-        </Pressable>
-      </View>
 
-      {(err || results.length > 0) && (
-        <View style={styles.panel} pointerEvents="auto">
+        {/* Dropdown panel */}
+        <View style={styles.modalPanel} pointerEvents="auto">
           {err ? <Text style={styles.err}>{err}</Text> : null}
 
           <FlatList
@@ -120,8 +158,7 @@ export default function SearchOverlay({
               <Pressable
                 style={styles.row}
                 onPress={() => {
-                  // ✅ Tap confirmation (remove later)
-                  console.log("Tapped result:", item.name);
+                  // ✅ On-device proof that taps are registering (remove later)
 
                   Keyboard.dismiss();
                   setResults([]);
@@ -138,13 +175,9 @@ export default function SearchOverlay({
             )}
           />
         </View>
-      )}
-    </View>
-  </View>
-);
-
-
-
+      </Modal>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -154,6 +187,20 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     zIndex: 9999,
+  },
+  clearBtn: {
+    height: 42,
+    width: 42,
+    borderRadius: 12,
+    backgroundColor: "f0f0f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  clearText: {
+    fontSize: 24,
+    color: "#111",
+    fontWeight: "700",
+    lineHeight: 22,
   },
   bar: {
     flexDirection: "row",
@@ -183,17 +230,24 @@ const styles = StyleSheet.create({
   },
   goText: { color: "white", fontWeight: "700" },
 
-  panel: {
-    marginTop: 10,
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+  },
+
+  modalPanel: {
+    position: "absolute",
+    top: 56 + 62, // search bar top + bar height-ish
+    left: 12,
+    right: 12,
     backgroundColor: "white",
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#eee",
     overflow: "hidden",
-    maxHeight: 260,
-    zIndex: 9999,
-
+    maxHeight: 320,
   },
+
   err: {
     padding: 12,
     color: "#b00020",
